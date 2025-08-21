@@ -1,0 +1,14 @@
+# MacOS
+.cache
+.DS_Store
+
+# IDE
+.idea/
+*.sublime-project
+*.sublime-workspace
+.vscode/
+
+# Project Ignores
+bin/**
+build/**
+.env
