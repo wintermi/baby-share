@@ -42,8 +42,8 @@ func NewServer(addr, staticDir string) (*Server, error) {
 	server := &http.Server{
 		Addr:         addr,
 		Handler:      r,
-		ReadTimeout:  15 * time.Second,
-		WriteTimeout: 15 * time.Second,
+		ReadTimeout:  3600 * time.Second,
+		WriteTimeout: 3600 * time.Second,
 		IdleTimeout:  60 * time.Second,
 	}
 
