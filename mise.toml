@@ -1,0 +1,76 @@
+[vars]
+BUILD_DIR = "{{ cwd }}/build"
+VERSION = "{{ exec(command='git describe --tags --always --dirty') }}"
+BUILD = "{{ exec(command='git rev-list --count HEAD') }}"
+COMMIT = "{{ exec(command='git rev-parse --short HEAD') }}"
+COMMIT_LONG = "{{ exec(command='git rev-parse HEAD') }}"
+
+[tools]
+go = "1.24"
+"aqua:golangci/golangci-lint" = "latest"
+"aqua:securego/gosec" = "latest"
+"go:github.com/go-critic/go-critic/cmd/gocritic" = "latest"
+
+[tasks."setup"]
+description = "Setup the project"
+run = ["mise install", "go mod download", "go mod tidy"]
+sources = ["go.mod", "mise.toml", "*/**/*.go"]
+outputs = ["go.sum"]
+
+[tasks."clean"]
+description = "Clean the project"
+run = [
+  "rm -rf '{{ cwd }}/bin'",
+  "mkdir -p '{{ cwd }}/bin'",
+  "rm -rf '{{ vars.BUILD_DIR }}'",
+  "mkdir -p '{{ vars.BUILD_DIR }}/data'",
+]
+
+[tasks."critic"]
+description = "Run Go Critic against the project"
+depends = ["clean"]
+run = ["gocritic check -disable='#style' ./..."]
+sources = ["*/**/*.go"]
+
+[tasks."security"]
+description = "Run Go Sec against the project"
+depends = ["clean"]
+run = ["gosec ./..."]
+sources = ["*/**/*.go"]
+
+[tasks."lint"]
+description = "Run Go Lint against the project"
+depends = ["clean"]
+run = ["golangci-lint run --timeout=10m ./..."]
+sources = ["*/**/*.go"]
+
+[tasks."tests"]
+description = "Run the tests"
+depends = ["clean", "critic", "security", "lint"]
+run = [
+  "go test -v -timeout 5m -coverprofile='{{ vars.BUILD_DIR }}/cover.out' -coverpkg=./... -cover ./...",
+  "go tool cover -func='{{ vars.BUILD_DIR }}/cover.out'",
+]
+sources = ["*/**/*.go"]
+outputs = ["{{ vars.BUILD_DIR }}/cover.out"]
+
+[tasks."build:server"]
+description = "Build the baby-share server binary"
+depends = ["clean"]
+run = [
+  "CGO_ENABLED=0 go build -ldflags='-w -s -X main.version={{ vars.VERSION }}' -o bin/baby-share server.go",
+]
+sources = ["server.go"]
+outputs = ["bin/baby-share"]
+
+[tasks."build"]
+description = "Build the project"
+depends = ["tests", "build:server"]
+run = ["echo 'Build successful'"]
+sources = ["*/**/*.go"]
+
+[tasks."run"]
+description = "Run the baby-share server"
+depends = ["build:server"]
+run = ["./bin/baby-share ./static 8080"]
+sources = ["bin/baby-share"]
