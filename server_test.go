@@ -204,12 +204,12 @@ func TestServerTimeouts(t *testing.T) {
 		t.Fatalf("Failed to create server: %v", err)
 	}
 
-	if server.httpServer.ReadTimeout != 3600*time.Second {
-		t.Errorf("Expected ReadTimeout 3600s, got %v", server.httpServer.ReadTimeout)
+	if server.httpServer.ReadTimeout != 24*time.Hour {
+		t.Errorf("Expected ReadTimeout 24h, got %v", server.httpServer.ReadTimeout)
 	}
 
-	if server.httpServer.WriteTimeout != 3600*time.Second {
-		t.Errorf("Expected WriteTimeout 3600s, got %v", server.httpServer.WriteTimeout)
+	if server.httpServer.WriteTimeout != 60*time.Second {
+		t.Errorf("Expected WriteTimeout 60s, got %v", server.httpServer.WriteTimeout)
 	}
 
 	if server.httpServer.IdleTimeout != 60*time.Second {
