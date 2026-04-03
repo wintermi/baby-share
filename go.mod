@@ -1,5 +1,5 @@
 module github.com/wintermi/baby-share
 
-go 1.24
+go 1.26
 
-require github.com/go-chi/chi/v5 v5.2.2
+require github.com/go-chi/chi/v5 v5.2.5

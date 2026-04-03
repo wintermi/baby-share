@@ -6,7 +6,7 @@ COMMIT = "{{ exec(command='git rev-parse --short HEAD') }}"
 COMMIT_LONG = "{{ exec(command='git rev-parse HEAD') }}"
 
 [tools]
-go = "1.24"
+go = "1.26"
 "aqua:golangci/golangci-lint" = "latest"
 "aqua:securego/gosec" = "latest"
 "go:github.com/go-critic/go-critic/cmd/gocritic" = "latest"
